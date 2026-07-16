@@ -10,7 +10,7 @@ import { categoryRoutes } from './modules/category/category.routes';
 import cors from "cors";
 import { authRoutes } from './modules/auth/auth.route';
 const app = express();
-const port = process.env.BACKEND_PORT;
+const PORT = process.env.PORT || process.env.BACKEND_PORT || 3000;
 console.log("Better Auth URL:", process.env.BETTER_AUTH_URL);
 console.log("App URL:", process.env.APP_URL);
 console.log("Database URL:", process.env.DATABASE_URL);

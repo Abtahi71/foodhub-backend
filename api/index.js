@@ -2000,7 +2000,7 @@ var authRoutes = router7;
 
 // src/app.ts
 var app = express8();
-var port = process.env.BACKEND_PORT;
+const PORT = process.env.PORT || process.env.BACKEND_PORT || 3000;
 console.log("Better Auth URL:", process.env.BETTER_AUTH_URL);
 console.log("App URL:", process.env.APP_URL);
 console.log("Database URL:", process.env.DATABASE_URL);
@@ -2037,8 +2037,8 @@ app.use("/admin", adminRoutes);
 app.use("/review", reviewRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/auth", authRoutes);
-app.listen(port, () => {
-  console.log(`Better Auth app listening on port ${port}`);
+app.listen((PORT), () => {
+  console.log(`Better Auth app listening on port ${PORT}`);
 });
 var app_default = app;
 
