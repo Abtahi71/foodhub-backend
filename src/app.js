@@ -55,6 +55,4 @@ app.use("/admin", adminRoutes);
 app.use("/review", reviewRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/auth",authRoutes)
-app.listen(port, () => {
-    console.log(`Better Auth app listening on port ${port}`);
-});
+

@@ -69,8 +69,6 @@ app.use("/auth",authRoutes)
 
 //app.options("*", cors());
 
-app.listen(port, () => {
-  console.log(`Better Auth app listening on port ${port}`);
-});
+
 
 export default app;

@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "dist/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/app.ts",
-    "start": "node dist/app.js",
-    "build": "prisma generate && tsup src/index.ts --format esm --platform node --target node20 --outDir api --external pg-native",
+    "build": "prisma generate && tsc",
+    "start": "node dist/src/index.js",
     "postinstall": "prisma generate"
   },
   "keywords": [],
@@ -43,7 +42,6 @@
     "multer": "^2.0.2",
     "nodemailer": "^8.0.1",
     "pg": "^8.17.2",
-    "tsup": "^8.5.1",
     "vercel": "^50.22.1"
   }
 }
