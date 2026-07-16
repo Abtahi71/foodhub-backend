@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.BACKEND_PORT;
 console.log("Better Auth URL:", process.env.BETTER_AUTH_URL);
 console.log("App URL:", process.env.APP_URL);
-console.log("Database URL:", process.env.BACKEND_PORT);
+console.log("Database URL:", process.env.DATABASE_URL);
 const allowedOrigins = [
   process.env.BETTER_AUTH_URL || "http://localhost:3000",
   process.env.APP_URL, // Production frontend URL

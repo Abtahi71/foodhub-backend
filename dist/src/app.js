@@ -13,7 +13,7 @@ const app = express();
 const port = process.env.BACKEND_PORT;
 console.log("Better Auth URL:", process.env.BETTER_AUTH_URL);
 console.log("App URL:", process.env.APP_URL);
-console.log("Database URL:", process.env.BACKEND_PORT);
+console.log("Database URL:", process.env.DATABASE_URL);
 app.use(cors({
     origin: `${process.env.APP_URL}`,
     credentials: true,
