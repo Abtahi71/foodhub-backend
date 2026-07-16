@@ -6,13 +6,13 @@ const router = express.Router();
 
 router.post(
   "/provider/:providerId",
-  auth(UserRole.CUSTOMER),
+  auth(UserRole.CUSTOMER, UserRole.PROVIDER),
   reviewController.reviewProvider
 );
 
 router.get(
   "/my_reviews/:providerId",
-  auth(UserRole.CUSTOMER),
+  auth(UserRole.CUSTOMER, UserRole.PROVIDER),
   reviewController.getMyReviews
 );
 

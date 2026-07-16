@@ -6,29 +6,29 @@ const router = express.Router();
 
 router.post(
   "/add_to_cart/:providerMealId",
-  auth(UserRole.CUSTOMER),
+  auth(UserRole.CUSTOMER, UserRole.PROVIDER),
   orderController.addToCart
 );
 
-router.get("/cart", auth(UserRole.CUSTOMER), orderController.getCart);
+router.get("/cart", auth(UserRole.CUSTOMER, UserRole.PROVIDER), orderController.getCart);
 router.delete(
   "/clear_cart",
-  auth(UserRole.CUSTOMER),
+  auth(UserRole.CUSTOMER, UserRole.PROVIDER),
   orderController.clearCart
 );
 router.post(
   "/checkout",
-  auth(UserRole.CUSTOMER),
+  auth(UserRole.CUSTOMER, UserRole.PROVIDER),
   orderController.checkOutOrder
 );
-router.get("/getOrders", auth(UserRole.CUSTOMER), orderController.getOrders);
+router.get("/getOrders", auth(UserRole.CUSTOMER, UserRole.PROVIDER), orderController.getOrders);
 router.get(
   "/orders/:orderId",
-  auth(UserRole.CUSTOMER),
+  auth(UserRole.CUSTOMER, UserRole.PROVIDER),
   orderController.getOrderDetails
 );
 
-router.get('/getMyOrder', auth(UserRole.CUSTOMER), orderController.getMyOrder);
+router.get('/getMyOrder', auth(UserRole.CUSTOMER, UserRole.PROVIDER), orderController.getMyOrder);
 
 
 
