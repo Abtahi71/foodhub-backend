@@ -1980,9 +1980,9 @@ var signUp2 = async (req, res) => {
 var login2 = async (req, res) => {
   const result = await authService.login(req.body);
   res.cookie("token", result.token, {
-    secure: false,
+    secure: true,
     httpOnly: true,
-    sameSite: "strict"
+    sameSite: "none"
   });
   return res.json({
     success: true,

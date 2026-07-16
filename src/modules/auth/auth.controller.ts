@@ -23,9 +23,9 @@ const login = async(req: Request, res: Response) => {
        // console.log('THIS IS THE USER IN BACKNED',result)
 
     res.cookie("token", result.token, {
-        secure:false,
+        secure:true,
         httpOnly:true,
-        sameSite:"strict"
+        sameSite:"none"
     })
     return res.json({
         success:true,
