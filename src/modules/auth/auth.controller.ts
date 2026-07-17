@@ -7,128 +7,71 @@ import { IUserLoginPayload, IUserPayload } from "./auth.interface";
 import AppError from "../../errorHelpers/AppError";
 import { tokenUtils } from "../../utils/token";
 import { IRequestUser } from "../../interfaces/interface";
+import { authService } from "./auth.services";
+import { Request, Response } from "express";
+import { catchAsync } from "../../shared/catchAsync";
+import { sendResponse } from "../../shared/sendResponse";
 
 
-const registerUser = async (payload: IUserPayload) => {
-  const { name, email, password } = payload;
+const registerUser = catchAsync(async (req: Request, res: Response) => {
 
-  const existingUser = await prisma.user.findUnique({ where: { email } });
+  console.log("THIS IS THE req.body", req.body);
+  const result = await authService.registerUser(req.body);
+  console.log("THIS IS THE RESULT", result);
+  const { userData, accessToken, refreshToken } = result;
 
-  if (existingUser) {
-    throw new Error("User already exists");
-  }
+  tokenUtils.setAccessTokenCookie(res, accessToken);
+  tokenUtils.setRefreshTokenCookie(res, refreshToken);
 
-  const hasehdPassword = await bcrypt.hash(password, 10);
-
-  const user = await prisma.user.create({
+  sendResponse(res, {
+    statusCode: status.CREATED,
+    success: true,
+    message: "User created successfully",
     data: {
-      name,
-      email,
-      password: hasehdPassword,
+      userData,
+      accessToken,
+      refreshToken,
     },
   });
+});
 
-  if (!user) {
-    throw new AppError(
-      status.INTERNAL_SERVER_ERROR,
-      "User could not be created"
-    );
-  }
+const loginUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await authService.loginUser(req.body);
 
-  const accessToken = tokenUtils.getAccessToken({
-    userId: user.id,
-    role: user.role,
-    name: user.name,
-    email: user.email,
-    emailVerified: user.emailVerified,
-  });
-  const refreshToken = tokenUtils.getRefreshToken({
-    userId: user.id,
-    role: user.role,
-    name: user.name,
-    email: user.email,
-    emailVerified: user.emailVerified,
-  });
+  const { userData, accessToken, refreshToken } = result;
 
-  const { password: _, ...userData } = user;
-  return {
-    userData,
-    accessToken,
-    refreshToken,
-  };
-};
+  // console.log('THIS IS THE USER DATA',userData)
+  // console.log('THIS IS THE ACCESS TOKEN',accessToken)
+  // console.log('THIS IS THE REFRESH TOKEN',refreshToken)
 
-const getMe = async (user: IRequestUser) => {
-  const Me = await prisma.user.findUnique({
-    where: {
-      id: user.userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
+  tokenUtils.setAccessTokenCookie(res, accessToken);
+  tokenUtils.setRefreshTokenCookie(res, refreshToken);
+
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "User logged in successfully",
+    data: {
+      userData,
+      accessToken,
+      refreshToken,
     },
   });
+});
 
-  if (!Me) {
-    throw new AppError(status.NOT_FOUND, "User not found");
-  }
-  return Me;
-};
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
 
-const loginUser = async (payload: IUserLoginPayload) => {
-  const { email, password } = payload;
+  const result = await authService.getMe(user);
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-
-      emailVerified: true,
-      password: true,
-    },
+  // console.log('THIS IS THE USER',user)
+  // console.log('THIS IS THE RESULT',result)
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "User fetched successfully",
+    data: result,
   });
-
-  if (!user) {
-    throw new AppError(status.NOT_FOUND, "User not found");
-  }
-
-  const isPasswordMatched = await bcrypt.compare(password, user.password);
-
-  if (!isPasswordMatched) {
-    throw new AppError(status.UNAUTHORIZED, "Invalid credentials");
-  }
-
-  const accessToken = tokenUtils.getAccessToken({
-    userId: user.id,
-    role: user.role,
-    name: user.name,
-    email: user.email,
-
-    emailVerified: user.emailVerified,
-  });
-  const refreshToken = tokenUtils.getRefreshToken({
-    userId: user.id,
-    role: user.role,
-    name: user.name,
-    email: user.email,
- 
-    emailVerified: user.emailVerified,
-  });
-
-  const { password: _, ...userData } = user;
-
-  return {
-    userData,
-    accessToken,
-    refreshToken,
-  };
-};
+});
 
 export const authController = { loginUser, registerUser, getMe };

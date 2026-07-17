@@ -1,7 +1,8 @@
+import { Role } from "@prisma/client";
 import { Request, Response } from "express";
-import { adminServices } from "./admin.services.js";
-import { UserRole } from "../../middleware/auth.js";
-import { pagination } from "../../helpers/pagination.js";
+import { pagination } from "../../helpers/pagination";
+import { adminServices } from "./admin.services";
+
 
 const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -12,7 +13,7 @@ const getAllUsers = async (req: Request, res: Response) => {
     const name = req.query.name as string;
 
     let role = req.query.role as string;
-    role = (role?.toUpperCase() as keyof typeof UserRole) || undefined;
+    role = (role?.toUpperCase() as keyof typeof Role) || undefined;
     const isActive = req.query.isActive
       ? req.query.isActive === "true"
         ? true
@@ -41,18 +42,18 @@ const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-const updateUserRole = async (req: Request, res: Response) => {
+const updateRole = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
     const { role } = req.body;
-    const validRoles = Object.values(UserRole);
+    const validRoles = Object.values(Role);
 
     if (!validRoles.includes(role)) {
       return res.status(400).json({
         message: `Invalid role. Valid roles are: ${validRoles.join(", ")}`,
       });
     }
-    const Role: UserRole = role as UserRole;
+    
     const result = await adminServices.updateUserRole(userId as string, role);
     res
       .status(200)
@@ -99,7 +100,7 @@ const updateUserStatus = async (req: Request, res: Response) => {
 
 export const adminController = {
   getAllUsers,
-  updateUserRole,
+  updateRole,
   getOrders,
   updateUserStatus,
 };

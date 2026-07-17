@@ -1,5 +1,6 @@
-import { prisma } from "../../lib/prisma.js";
-import { UserRole } from "../../middleware/auth.js";
+import { Role } from "@prisma/client";
+import { prisma } from "../../lib/prisma";
+
 
 const getAllUsers = async ({
   search,
@@ -136,7 +137,7 @@ const getOrders = async ({
   };
 };
 
-const updateUserRole = async (userId: string, role: UserRole) => {
+const updateUserRole = async (userId: string, role: Role) => {
   const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: {

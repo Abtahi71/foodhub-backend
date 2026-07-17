@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { providerServices } from "./provider.services.js";
-//import { prisma } from "../../lib/prisma.js";
-import cloudinary from "../../config/cloudinary.js";
+import cloudinary from "../../config/cloudinary";
+import { providerServices } from "./provider.services";
+
 
 const register = async (req: Request, res: Response) => {
   const userId = req.user?.id;

@@ -1,49 +1,60 @@
-
 import { NextFunction, Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { prisma } from "../lib/prisma";
 
-export const secret = process.env.BETTER_AUTH_SECRET!;
-export enum UserRole {
-  ADMIN = "ADMIN",
-  PROVIDER = "PROVIDER",
-  CUSTOMER = "CUSTOMER",
-}
+import status from "http-status";
+import "dotenv/config";
+import { JwtPayload } from "jsonwebtoken";
+import { IRequestUser } from "../interfaces/interface";
+import AppError from "../errorHelpers/AppError";
+import { jwtUtils } from "../utils/jwt";
+import { Role } from "@prisma/client";
 
-const auth = (...roles: UserRole[]) => {
+const secret = process.env.JWT_SECRET as string;
+
+const auth = (...roles: Role[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-    
-      let token = req.headers.authorization;
+      let token = req.headers.authorization?.split(" ")[1];
 
-      if(!req.headers.authorization){
-        token = req.cookies.token
+      if (!req.headers.authorization) {
+        token = req.cookies.token;
       }
 
-      if (!token ) {
-        throw new Error("Token not found!!");
+      if (!token) {
+        throw new AppError(status.UNAUTHORIZED, "Token not found!!");
       }
 
-      const decoded = jwt.verify(token, secret) as JwtPayload;
+      const decoded = jwtUtils.verifyToken(token, secret) as JwtPayload;
+
+      //console.log('DECODED:"',decoded)
+
+      if (!decoded.success || !decoded.data.userId) {
+        throw new AppError(status.UNAUTHORIZED, decoded.message);
+      }
 
       const userData = await prisma.user.findUnique({
         where: {
-          email: decoded.email,
+          id: decoded.data.userId,
         },
       });
       if (!userData) {
-        throw new Error("Unauthorized!");
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized!");
       }
 
-      if (roles.length && !roles.includes(decoded.role)) {
-        throw new Error("Unauthorized!!!");
+      if (roles.length && !roles.includes(userData.role)) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized!!!");
       }
 
-      req.user = decoded;
+      req.user = {
+        id: userData.id,
+        role: userData.role,
+        email: userData.email,
+      } as IRequestUser;
 
       next();
     } catch (error: any) {
+      console.log(error.message);
       next(error);
     }
   };

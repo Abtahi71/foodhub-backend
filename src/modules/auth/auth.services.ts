@@ -71,7 +71,7 @@ const registerUser = async (payload: IUserPayload) => {
 const getMe = async (user: IRequestUser) => {
   const Me = await prisma.user.findUnique({
     where: {
-      id: user.userId,
+      id: user.id,
     },
     select: {
       id: true,

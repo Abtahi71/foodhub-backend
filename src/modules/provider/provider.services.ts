@@ -1,7 +1,7 @@
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, Role } from "@prisma/client";
+import { prisma } from "../../lib/prisma";
 //import { OrderStatus } from "@prisma/enums";
-import { prisma } from "../../lib/prisma.js";
-import { UserRole } from "../../middleware/auth.js";
+
 
 const register = async (
   userId: string,
@@ -24,7 +24,7 @@ const register = async (
     const user = await prisma.user.update({
       where: { id: userId },
       data: {
-        role: UserRole.PROVIDER,
+        role: Role.PROVIDER,
       },
     });
   }

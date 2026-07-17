@@ -1,4 +1,5 @@
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from "../../lib/prisma";
+
 
 const getCategories = async () => {
   const categories = await prisma.category.findMany({

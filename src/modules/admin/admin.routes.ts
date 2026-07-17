@@ -1,22 +1,24 @@
 import express from "express";
-import { adminController } from "./admin.controller.js";
-import auth, { UserRole } from "../../middleware/auth.js";
+import auth from "../../middleware/auth";
+import { Role } from "@prisma/client";
+import { adminController } from "./admin.controller";
+
 
 const router = express.Router();
 
-router.get("/users", auth(UserRole.ADMIN), adminController.getAllUsers);
+router.get("/users", auth(Role.ADMIN), adminController.getAllUsers);
 
 router.patch(
   "/users/:id",
-  auth(UserRole.ADMIN),
-  adminController.updateUserRole
+  auth(Role.ADMIN),
+  adminController.updateRole
 );
 
-router.get("/orders", auth(UserRole.ADMIN), adminController.getOrders);
+router.get("/orders", auth(Role.ADMIN), adminController.getOrders);
 
 router.put(
   "/users/:id",
-  auth(UserRole.ADMIN),
+  auth(Role.ADMIN),
   adminController.updateUserStatus
 );
 
