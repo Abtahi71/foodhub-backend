@@ -37,6 +37,7 @@
     "dotenv": "^17.2.3",
     "effect": "^3.19.18",
     "express": "^5.2.1",
+    "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
     "jwt-decode": "^4.0.0",
     "multer": "^2.0.2",

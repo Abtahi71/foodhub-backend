@@ -1,76 +1,146 @@
+import { status } from "http-status";
 
-import { Request, Response } from "express";
-import { auth as betterAuth } from "../../lib/auth.js";
-import { prisma } from '../../lib/prisma.js';
+import { prisma } from "../../lib/prisma";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { tokenUtils } from "../../utils/token";
 
-export const secret = process.env.BETTER_AUTH_SECRET!;
 
-const signUp = async (userdata: { email: string; password: string; name: string }) => {
-    const user = await prisma.user.findUnique({
-        where: {
-            email: userdata.email,
-        },
-    })
-    if (user) {
-        throw new Error("User already exists");
-    }
-    const hashedPassword = await bcrypt.hash(userdata.password, 6);
-    const newUser = await prisma.user.create({
-        data:{
-            email: userdata.email,
-            password: hashedPassword,
-            name: userdata.name,
-        }
-    })
-    const {password, ...userData} = newUser;
-    return userData;
-}
 
-const getMe = async(userId:string)=>{
-  const user = await prisma.user.findUnique({
-    where:{
-      id: userId
+import { jwtUtils } from "../../utils/jwt";
+import { JwtPayload } from "jsonwebtoken";
+import { CookieUtils } from "../../utils/cookie";
+import { Response } from "express";
+
+import AppError from "../../errorHelpers/AppError";
+import { IRequestUser } from "../../interfaces/interface";
+import { IUserLoginPayload, IUserPayload } from "./auth.interface";
+
+export const secret = process.env.BETTER_AUTH_SECRET;
+
+const registerUser = async (payload: IUserPayload) => {
+  const { name, email, password } = payload;
+
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+
+  if (existingUser) {
+    throw new Error("User already exists");
+  }
+
+  const hasehdPassword = await bcrypt.hash(password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hasehdPassword,
     },
-    select:{
+  });
+
+  if (!user) {
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      "User could not be created"
+    );
+  }
+
+  const accessToken = tokenUtils.getAccessToken({
+    userId: user.id,
+    role: user.role,
+    name: user.name,
+    email: user.email,
+
+    emailVerified: user.emailVerified,
+  });
+  const refreshToken = tokenUtils.getRefreshToken({
+    userId: user.id,
+    role: user.role,
+    name: user.name,
+    email: user.email,
+
+    emailVerified: user.emailVerified,
+  });
+
+  const { password: _, ...userData } = user;
+  return {
+    userData,
+    accessToken,
+    refreshToken,
+  };
+};
+
+const getMe = async (user: IRequestUser) => {
+  const Me = await prisma.user.findUnique({
+    where: {
+      id: user.userId,
+    },
+    select: {
       id: true,
       name: true,
       email: true,
       role: true,
-      isActive: true
-    }
-  })
-  return user
-}
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
 
-    const login = async (userdata: { email: string; password: string }) => {
-      const user = await prisma.user.findUnique({
-        where: {
-          email: userdata.email,
-        },
-      });
-      if (!user) {
-        throw new Error("User not found");
-      }
-      const match = await bcrypt.compare(userdata.password, user.password);
-      if (!match) {
-        throw new Error("Invalid password");
-      }
-      const userData = {
-        id: user.id,
-        name: user.name,
-        role: user.role,
-        isActive: user.isActive,
-        email: user.email,
-      };
+  if (!Me) {
+    throw new AppError(status.NOT_FOUND, "User not found");
+  }
+  return Me;
+};
 
-      const token = jwt.sign(userData, secret, { expiresIn: "1d" });
+const loginUser = async (payload: IUserLoginPayload) => {
+  const { email, password } = payload;
 
-      return {
-        token,
-        user,
-      };
-    };
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+ 
+      emailVerified: true,
+      password: true,
+    },
+  });
 
-export const authService = {login,signUp,getMe}
+  if (!user) {
+    throw new AppError(status.NOT_FOUND, "User not found");
+  }
+
+  const isPasswordMatched = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordMatched) {
+    throw new AppError(status.UNAUTHORIZED, "Invalid credentials");
+  }
+
+
+
+  const accessToken = tokenUtils.getAccessToken({
+    userId: user.id,
+    role: user.role,
+    name: user.name,
+    email: user.email,
+
+    emailVerified: user.emailVerified,
+  });
+  const refreshToken = tokenUtils.getRefreshToken({
+    userId: user.id,
+    role: user.role,
+    name: user.name,
+    email: user.email,
+
+    emailVerified: user.emailVerified,
+  });
+
+  const { password: _, ...userData } = user;
+
+  return {
+    userData,
+    accessToken,
+    refreshToken,
+  };
+};
+
+export const authService = { loginUser, registerUser, getMe };
