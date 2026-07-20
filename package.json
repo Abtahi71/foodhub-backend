@@ -6,7 +6,6 @@
     "dev": "tsx watch src/app.ts",
     "build": "tsup src/server.ts --format esm",
     "start": "node dist/server.js"
-    
   },
   "keywords": [],
   "author": "",
@@ -43,6 +42,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^8.0.1",
     "pg": "^8.17.2",
+    "tsup": "^8.5.1",
     "vercel": "^50.22.1"
   }
 }
