@@ -28,13 +28,24 @@ const getCategoryProviders = async(req:Request,res:Response)=>{
 
 const getCategoryMeals = async(req:Request,res:Response)=>{
     try{
-        const {name,providerId} = req.params;
-        console.log(name,providerId)
+        
+        const {providerId} = req.params;
+        const {category} = req.query;
+        console.log(category,providerId)
         
         if(!providerId){
             return res.status(400).json({error:"providerId query parameter is required"})
         }
-        const result = await categoryService.getCategoryMeals(providerId as string,name as string);
+        let result
+        if(category){
+            result = await categoryService.getCategoryMeals(
+              providerId as string,
+              category as string
+            );
+        }else{
+            result = await categoryService.getCategoryMeals(providerId as string);
+        }
+        
         return res.json({result})
 
     }catch(e:any){

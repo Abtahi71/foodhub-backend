@@ -2,6 +2,7 @@ import { Role } from "@prisma/client";
 import { Request, Response } from "express";
 import { pagination } from "../../helpers/pagination";
 import { adminServices } from "./admin.services";
+import { sort } from "effect/Chunk";
 
 
 const getAllUsers = async (req: Request, res: Response) => {
@@ -12,7 +13,7 @@ const getAllUsers = async (req: Request, res: Response) => {
     const searchString = typeof search === "string" ? search : undefined;
     const name = req.query.name as string;
 
-    let role = req.query.role as string;
+    let role = req.query.userRole as string;
     role = (role?.toUpperCase() as keyof typeof Role) || undefined;
     const isActive = req.query.isActive
       ? req.query.isActive === "true"
@@ -65,8 +66,7 @@ const updateRole = async (req: Request, res: Response) => {
 
 const getOrders = async (req: Request, res: Response) => {
   try {
-    console.log("auiufdbfiuabsfiafnoafbaojfoafaofnoa");
-    console.log("Received query parameters for orders:", req.query);
+  
     const { page, skip, limit } = pagination(req.query);
     const result = await adminServices.getOrders({ page, skip, limit });
     console.log(result);
@@ -97,8 +97,30 @@ const updateUserStatus = async (req: Request, res: Response) => {
       .json({ message: "Internal server error", error: e.message });
   }
 };
+type SortBy = "rating" | "orderCount" | "createdAt";
+type SortOrder = "asc" | "desc";
+
+const getAllProviders = async (req: Request, res: Response) => {
+
+  
+  try {
+    console.log("PROVIDER ROUTE IN ADMIN IS BEING HIT");
+    const { sortBy, sortOrder,minRating,searchTerm } = req.query
+    const { page, skip, limit } = pagination(req.query);
+    const minRatingNumber = minRating ? Number(minRating) : 0;
+    const result = await adminServices.getAllProviders(sortBy as SortBy, sortOrder as SortOrder,minRatingNumber,searchTerm as string, page, limit);
+    //console.log("THIS IS THE RESULT IN THE AMDIN CONTROLLER", result);
+    res
+      .status(200)
+      .json({ data: result, message: "Providers fetched successfully" });
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const adminController = {
+  getAllProviders,
   getAllUsers,
   updateRole,
   getOrders,

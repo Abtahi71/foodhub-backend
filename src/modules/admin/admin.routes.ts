@@ -7,6 +7,7 @@ import { adminController } from "./admin.controller";
 const router = express.Router();
 
 router.get("/users", auth(Role.ADMIN), adminController.getAllUsers);
+router.get("/providers", auth(Role.ADMIN), adminController.getAllProviders);
 
 router.patch(
   "/users/:id",

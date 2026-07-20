@@ -290,7 +290,7 @@ const getProviderMeals = async (providerId: string) => {
 
 const updateOrderStatus = async (
   orderId: string,
-  status: OrderStatus,
+  newStatus: OrderStatus,
   userId: string
 ) => {
   const order = await prisma.order.findUnique({
@@ -305,10 +305,12 @@ const updateOrderStatus = async (
   if (order.provider.userId !== userId) {
     throw new Error("You are not the provider for this order");
   }
-  const updatedOrder = await prisma.order.update({
+  let updatedOrder
+  
+    updatedOrder = await prisma.order.update({
     where: { id: orderId },
     data: {
-      status: status,
+      status: newStatus,
     },
   });
   return updatedOrder;

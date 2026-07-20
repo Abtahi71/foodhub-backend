@@ -33,17 +33,17 @@ const getCategoryProviders = async (name: string) => {
   return providers;
 };
 
-const getCategoryMeals = async (providerId: string, category: string) => {
+const getCategoryMeals = async (providerId: string, category?: string) => {
   const meals = await prisma.providerMeal.findMany({
     where: {
       providerId,
       isAvailable: true,
-      meal: {
+      ...(category && {meal: {
         category: {
           name: category,
         },
       },
-    },
+    }),},
     select: {
       price: true,
       image: true,

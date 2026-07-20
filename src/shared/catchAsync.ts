@@ -5,9 +5,11 @@ export const catchAsync = (fn: RequestHandler) => {
     try {
       await fn(req, res, next);
     } catch (error: any) {
-      res.status(500).json({
+      const statusCode = error.statusCode || 500
+      console.log(error.message)
+      res.status(statusCode).json({
         success: false,
-        message: "internal server error",
+        message: statusCode === 500 ? "internal server error": error.message,
         error: error.message,
       });
     }

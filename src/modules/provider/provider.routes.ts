@@ -45,7 +45,7 @@ router.post(
   providerController.createMeal
 );
 
-router.put(
+router.patch(
   "/meals/:id",
   auth(Role.PROVIDER),
   upload.single("image"),
@@ -57,7 +57,7 @@ router.delete(
   providerController.deleteMeal
 );
 
-router.put(
+router.patch(
   "/updateOrderStatus/:id",
   auth(Role.PROVIDER),
   providerController.updateOrderStatus

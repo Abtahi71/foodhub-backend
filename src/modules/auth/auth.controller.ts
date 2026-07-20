@@ -40,7 +40,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
   const { userData, accessToken, refreshToken } = result;
 
-  // console.log('THIS IS THE USER DATA',userData)
+  console.log('THIS IS THE USER DATA',userData)
   // console.log('THIS IS THE ACCESS TOKEN',accessToken)
   // console.log('THIS IS THE REFRESH TOKEN',refreshToken)
 
@@ -60,12 +60,11 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
+
   const user = req.user;
 
   const result = await authService.getMe(user);
 
-  // console.log('THIS IS THE USER',user)
-  // console.log('THIS IS THE RESULT',result)
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

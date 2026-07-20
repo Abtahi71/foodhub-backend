@@ -1,3 +1,4 @@
+import AppError from "../../errorHelpers/AppError";
 import { prisma } from "../../lib/prisma";
 
 
@@ -14,7 +15,7 @@ const reviewProvider = async (
     },
   });
   if (!isOrdered)
-    throw new Error("You can only review providers you have ordered from.");
+    throw new AppError(400,"You can only review providers you have ordered from.");
   const existingReview = await prisma.review.findFirst({
     where: {
       userId,

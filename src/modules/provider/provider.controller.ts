@@ -5,6 +5,7 @@ import { providerServices } from "./provider.services";
 
 const register = async (req: Request, res: Response) => {
   const userId = req.user?.id;
+  console.log("THIS IS THE USERID IN THE REGISTER ROUTE", userId);
   console.log("USER ID:", userId);
   if (!userId) {
     return res.status(400).json({ message: "User id is required" });
@@ -48,6 +49,7 @@ const register = async (req: Request, res: Response) => {
     };
 
     const result = await providerServices.register(userId, providerData);
+    console.log("THIS IS THE RESULT OF THE REGISTER ROUTE", result);
     return res
       .status(201)
       .json({ data: result, message: "Provider registered successfully" });
@@ -58,14 +60,16 @@ const register = async (req: Request, res: Response) => {
 
 const getMyProviders = async (req: Request, res: Response) => {
   try {
+    console.log("THE REQUEST IN THE PROVIDER CONTROLLER IS HITTT")
     const userId = req.user?.id;
     const search = req.query.searchTerm as string;
     console.log("this is the search query:", search);
+    console.log("this is the USER ID:", userId);
     const result = await providerServices.getMyProviders(
       userId as string,
       search
     );
-    //console.log(result);
+    console.log("RESULT FROM MEEEE",result);
     return res
       .status(200)
       .json({ data: result, message: "Providers fetched successfully" });
@@ -76,8 +80,7 @@ const getMyProviders = async (req: Request, res: Response) => {
 
 const getProviderOrders = async (req: Request, res: Response) => {
   const providerId = req.params.providerId;
-  //console.log("PROVIDER ID:", providerId);
-  // console.log('yayyyyaaaa')
+
   try {
     const result = await providerServices.getProviderOrders(
       providerId as string
@@ -185,11 +188,13 @@ const getAllProviders = async (req: Request, res: Response) => {
 };
 
 const getProviderMeals = async (req: Request, res: Response) => {
+ // console.log("PROVIDER ID:", req.params.id);
   const providerId = req.params.id;
   try {
     const result = await providerServices.getProviderMeals(
       providerId as string
     );
+   // console.log(result)
     return res
       .status(200)
       .json({ data: result, message: "Meals fetched successfully" });
@@ -199,23 +204,29 @@ const getProviderMeals = async (req: Request, res: Response) => {
 };
 
 const updateOrderStatus = async (req: Request, res: Response) => {
+  console.log("THE REQUEST HAS HIT THE STATUS")
   const userId = req.user?.id;
   const orderId = req.params.id;
-  const { status } = req.body;
+  const { newStatus } = req.body;
+  console.log("THIS IS THE STATUS", newStatus);
   const validStatuses = ["PENDING", "ON_THE_WAY", "PREPARING", "DELIVERED"];
-  if (!validStatuses.includes(status)) {
+ 
+  if (!validStatuses.includes(newStatus)) {
     return res.status(400).json({ message: "Invalid status" });
   }
   try {
+    
     const result = await providerServices.updateOrderStatus(
       orderId as string,
-      status,
+      newStatus,
       userId as string
     );
+    console.log("HSUABDUABDJASIAHOSIHAOSIA")
     return res
       .status(200)
       .json({ data: result, message: "Order status updated successfully" });
   } catch (e: any) {
+    console.log(e)
     res.status(500).json({ message: e.message });
   }
 };

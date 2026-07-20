@@ -11,7 +11,7 @@ router.get('/',
 router.get('/providers/:name',
     categoryController.getCategoryProviders)
 
-router.get('/providers/:name/:providerId/meals',
+router.get('/providers/:providerId/meals',
     categoryController.getCategoryMeals
 )
 

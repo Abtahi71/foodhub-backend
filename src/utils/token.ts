@@ -5,6 +5,7 @@ import { Response } from "express";
 import { jwtUtils } from "./jwt";
 
 const getAccessToken = (payload: JwtPayload) => {
+  //console.log("THIS IS MY JWT SECRET KEY", process.env.JWT_SECRET);
   const accessToken = jwtUtils.createToken(
     payload,
     process.env.JWT_SECRET as string,

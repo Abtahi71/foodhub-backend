@@ -17,6 +17,7 @@ type orderItems = {
 
 const addToCart = async (req: Request, res: Response) => {
   try{
+    console.log("THE ADD TO CARTROUTE IS HIT")
     const providerMealId = req.params.providerMealId;
     const userId = req.user?.id;
 
@@ -28,8 +29,6 @@ const addToCart = async (req: Request, res: Response) => {
       userId as string,
       providerMealId as string
     );
-
-    
     
     if (typeof result === "string") {
       // result is of type "Meal not found"

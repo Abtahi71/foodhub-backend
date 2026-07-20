@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { reviewServices } from "./reviews.services";
+import { catchAsync } from "../../shared/catchAsync";
 
 
-const reviewProvider = async (req: Request, res: Response) => {
-  try {
+const reviewProvider =catchAsync (async (req: Request, res: Response) => {
+   console.log("THE REVIEW ROUTE IS BEING HIT ")
     const userId = req.user?.id;
     const providerId = req.params.providerId;
     const { rating, comment } = req.body;
@@ -20,11 +21,8 @@ const reviewProvider = async (req: Request, res: Response) => {
     );
     // console.log(result)
     return res.status(201).json({ data: result, message: result.message });
-  } catch (e: any) {
-    console.log(e.message);
-    return res.status(500).json({ message: e.message });
-  }
-};
+
+})
 
 const getMyReviews = async (req: Request, res: Response) => {
   const userId = req.user?.id;
